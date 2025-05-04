@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TaskService } from '../../services/task.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
 import { Taskstatus } from '../../common/interfaces/user.interface';
 import { BreadcrumbComponent } from "../../common/breadcrumb/breadcrumb.component";
 import { Chart, registerables} from 'chart.js';
+import { Subject, takeUntil } from 'rxjs';
 
 Chart.register(...registerables)
 
@@ -23,7 +24,7 @@ Chart.register(...registerables)
   templateUrl: './user-details.component.html',
   styleUrl: './user-details.component.css'
 })
-export class UserDetailsComponent implements OnInit {
+export class UserDetailsComponent implements OnInit,OnDestroy {
   activateRoute = inject(ActivatedRoute);
   private taskService = inject(TaskService)
   userId: any='';
@@ -46,6 +47,7 @@ export class UserDetailsComponent implements OnInit {
   pieChartData : number[] = [];
   pieChart : any = null;
   loggedUser : any;
+  private destroy$ = new Subject<void>();
 
   statusOptions = [
     { label: 'Completed', value: 'Completed' },
@@ -58,10 +60,18 @@ export class UserDetailsComponent implements OnInit {
 
     this.activateRoute.paramMap.subscribe((userId)=> {
       this.userId = userId.get('uid');
-
-      if(this.userId) {
-        this.getUserDetails(this.userId)
-      }
+      this.taskService.getLoggedUser().pipe(takeUntil(this.destroy$)).subscribe({
+        next: (user:any)=> {
+          this.loggedUser = user;
+          if(this.userId) {
+            this.getUserDetails(this.userId)
+          }
+          console.log("LOGGED USER dash >> ", this.loggedUser);
+        },
+        error: (err:any)=>{
+  
+        }
+      })
     });
     this.breadCrumbItems = [
       {label: 'Home', route: '/dashboard', icon: 'fa fa-home'},
@@ -76,89 +86,98 @@ export class UserDetailsComponent implements OnInit {
       status: ['', Validators.required],
       summary:['']
     });
-
-    this.taskService.getLoggedUser().subscribe({
-      next: (user:any)=> {
-        this.loggedUser = user;
-        console.log("LOGGED USER dash >> ", this.loggedUser);
-      },
-      error: (err:any)=>{
-
-      }
-    })
     
   }
 
   getUserDetails(userId: any) {
     this.taskService.showloading(true);
-    this.taskService.getUserById(userId).subscribe({
-      next: (data: any) => {
-        console.log("USER DET >> ", data);
-        if (data) {
-          this.userdetails = data;
-  
-          if(data) {
-            this.taskService.getTasksForUser(userId).subscribe({
-              next: (tasks: any) => {
-                this.userdetails = { ...this.userdetails, tasks };
-                console.log("USER-DETAILS WITH TASKS >>", this.userdetails);
-  
-                if (this.userdetails.tasks) {
-                  const statusMap: { [key: string]: { total: number; count: number } } = {};
-                
-                  this.barChartLabel = [];
-                  this.barChartData = [];
-                  this.pieChartLabel = [];
-                  this.pieChartData = [];
-                
-                  this.userdetails.tasks.forEach((task: any) => {
-                    const status = task.status;
-                    const percent = task.percentageCompleted || 0;
-                
-                    // Bar chart - task-wise
-                    this.barChartLabel.push(task.taskName);
-                    this.barChartData.push(percent);
-                
-                    // Pie chart prep - status-wise
-                    if (!statusMap[status]) {
-                      statusMap[status] = { total: 0, count: 0 };
+    if(userId && this.loggedUser) {
+      this.taskService.getUserById(userId).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (data: any) => {
+          console.log("USER DET >> ", data);
+          if (data) {
+            if (!data) {
+              this.taskService.showloading(false);
+              this.taskService.showAlertMessage('error', 'User not found', 3000);
+              return;
+            }
+            this.userdetails = data;
+    
+            if(data && this.loggedUser) {
+              this.taskService.getTasksForUser(userId).pipe(takeUntil(this.destroy$)).subscribe({
+                next: (tasks: any) => {
+                  this.userdetails = { ...this.userdetails, tasks };
+                  console.log("USER-DETAILS WITH TASKS >>", this.userdetails);
+    
+                  if (this.userdetails.tasks) {
+                    const statusMap: { [key: string]: { total: number; count: number } } = {};
+                  
+                    this.barChartLabel = [];
+                    this.barChartData = [];
+                    this.pieChartLabel = [];
+                    this.pieChartData = [];
+                  
+                    this.userdetails.tasks.forEach((task: any) => {
+                      const status = task.status;
+                      const percent = task.percentageCompleted || 0;
+                  
+                      // Bar chart - task-wise
+                      this.barChartLabel.push(task.taskName);
+                      this.barChartData.push(percent);
+                  
+                      // Pie chart prep - status-wise
+                      if (!statusMap[status]) {
+                        statusMap[status] = { total: 0, count: 0 };
+                      }
+                      statusMap[status].total += percent;
+                      statusMap[status].count += 1;
+                    });
+                  
+                    // Pie chart - status-wise
+                    for (const status in statusMap) {
+                      this.pieChartLabel.push(status); // string
+                      const avg = statusMap[status].count;
+                      this.pieChartData.push(parseFloat(avg.toFixed(2)));
                     }
-                    statusMap[status].total += percent;
-                    statusMap[status].count += 1;
-                  });
-                
-                  // Pie chart - status-wise
-                  for (const status in statusMap) {
-                    this.pieChartLabel.push(status); // string
-                    const avg = statusMap[status].count;
-                    this.pieChartData.push(parseFloat(avg.toFixed(2)));
+                    setTimeout(() => {
+                      this.RenderBarChart(this.barChartLabel, this.barChartData);
+                      this.RenderPieChart(this.pieChartLabel,this.pieChartData )
+                    }, 0);
                   }
-                  setTimeout(() => {
-                    this.RenderBarChart(this.barChartLabel, this.barChartData);
-                    this.RenderPieChart(this.pieChartLabel,this.pieChartData )
-                  }, 0);
+                  this.taskService.showloading(false);
+                },
+                error: (taskErr) => {
+                  this.taskService.showloading(false);
+                  if (taskErr?.code === 'permission-denied') {
+                    console.warn('No permission to access tasks (probably logged out)');
+                    return;
+                  }
+                  this.taskService.showAlertMessage('error', 'Error loading tasks', 3000);
+                  console.error("Error fetching tasks:", taskErr);
                 }
-                this.taskService.showloading(false);
-              },
-              error: (taskErr) => {
-                this.taskService.showloading(false);
-                this.taskService.showAlertMessage('error', 'Error loading tasks', 3000);
-                console.error("Error fetching tasks:", taskErr);
-              }
-            });
+              });
+            }
+    
+          } else {
+            this.taskService.showloading(false);
+            this.taskService.showAlertMessage('error', 'User not found', 3000);
           }
-  
-        } else {
+        },
+        error: (err) => {
           this.taskService.showloading(false);
-          this.taskService.showAlertMessage('error', 'User not found', 3000);
+          this.taskService.showAlertMessage('error', 'Error fetching user details', 3000);
+          console.error("Error fetching user:", err);
         }
-      },
-      error: (err) => {
-        this.taskService.showloading(false);
-        this.taskService.showAlertMessage('error', 'Error fetching user details', 3000);
-        console.error("Error fetching user:", err);
-      }
-    });
+      });
+    }
+    else {
+      this.taskService.showloading(false);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   openTaskDialog() {
