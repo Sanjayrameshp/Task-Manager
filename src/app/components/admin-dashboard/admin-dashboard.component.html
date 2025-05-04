@@ -1,0 +1,72 @@
+<div class="dashboard bg-light py-5">
+    <div class="container">
+      <div class="row mb-4">
+        <div class="col-md-12 text-center">
+          <h1 class="display-5 fw-bold">Admin Dashboard</h1>
+        </div>
+      </div>
+  
+      <div class="row mb-3" *ngIf="loggedUser.role === 'Admin'">
+        <div class="col-md-12 text-end">
+          <p-button
+            (click)="showDialog()"
+            label="Register User"
+            icon="pi pi-user-plus"
+            class="p-button-success"
+          />
+        </div>
+      </div>
+  
+      @if (users.length > 0) {
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover bg-white">
+                <thead class="table-dark text-center">
+                  <tr>
+                    <th>No.</th>
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Phone Number</th>
+                    <th>Project</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (user of users; track $index) {
+                    <tr (click)="navigateToUserDetails(user.uid)" class="cursor-pointer">
+                      <td class="text-center">{{$index + 1}}</td>
+                      <td>{{user.name}}</td>
+                      <td>{{user.email}}</td>
+                      <td>{{user.role}}</td>
+                      <td>{{user.phone}}</td>
+                      <td>{{user.project}}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="row">
+          <div class="col-md-12 text-center">
+            <h4 class="text-muted">No Users Found</h4>
+          </div>
+        </div>
+      }
+  
+      <p-dialog
+        header="Register User"
+        [(visible)]="visible"
+        [modal]="true"
+        [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+        [style]="{ width: '50vw' }"
+        [draggable]="false"
+        [resizable]="false"
+      >
+        <app-register-user (formSubmittted)="reFetchUser($event)"></app-register-user>
+      </p-dialog>
+    </div>
+  </div>
+  

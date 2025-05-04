@@ -1,0 +1,27 @@
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+  .table th, .table td {
+    vertical-align: middle;
+  }
+  ::ng-deep .p-dialog .p-dialog-content {
+    padding-bottom: 2rem;
+  }
+  
+  ::ng-deep .p-dialog .p-dialog-footer {
+    padding-top: 0;
+  }
+  .min-chart-height {
+    min-height: 300px; /* Or any height that works well visually */
+    position: relative;
+  }
+  
+  .min-chart-height canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100% !important;
+    width: 100% !important;
+  }

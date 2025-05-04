@@ -1,0 +1,13 @@
+<p-breadcrumb class="max-w-full" [model]="items">
+    <ng-template let-item pTemplate="item">
+      <ng-container *ngIf="item.route; else elseBlock">
+        <a [routerLink]="item.route" class="p-breadcrumb-item-link flex items-center gap-2">
+          <i *ngIf="item.icon" [ngClass]="item.icon"></i>
+          <span class="text-primary font-semibold">{{ item.label }}</span>
+        </a>
+      </ng-container>
+      <ng-template #elseBlock>
+        <span class="text-color font-semibold">{{ item.label }}</span>
+      </ng-template>
+    </ng-template>
+  </p-breadcrumb>

@@ -1,0 +1,11 @@
+.login-main {
+    background-color: #f8f9fa;
+  }
+  
+  .card {
+    border-radius: 1rem;
+  }
+  
+  p-password::ng-deep .p-password {
+    width: 100% !important;
+  }

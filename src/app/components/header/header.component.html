@@ -1,0 +1,26 @@
+<div class="header-main bg-primary text-white py-3">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <!-- Logo or App Title -->
+        <div class="d-flex align-items-center">
+          <i class="pi pi-check-square text-white me-2" style="font-size: 1.5rem;"></i>
+          <h2 class="m-0">Task Manager</h2>
+        </div>
+  
+        <!-- Center Text or Navigation -->
+        <div class="d-none d-md-block text-center flex-grow-1">
+          <h5 class="m-0">Manage your tasks efficiently</h5>
+        </div>
+  
+        <!-- Right-side Action Button -->
+        <div>
+          <button (click)="LogOut()" class="btn btn-outline-light" *ngIf="isLogged" >
+            <i class="pi pi-user me-1"></i> LogOut
+          </button>
+          <button (click)="navigateToLogin()" class="btn btn-outline-light" *ngIf="!isLogged">
+            <i class="pi pi-user me-1"></i> LogIn
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>

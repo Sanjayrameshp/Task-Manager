@@ -1,0 +1,181 @@
+<div class="user-main py-4">
+    <div class="container">
+
+      <div class="row mb-3" *ngIf="loggedUser.role === 'Admin'">
+        <div class="col-md-6">
+          <app-breadcrumb [items]="breadCrumbItems"></app-breadcrumb>
+        </div>
+        <div class="col-md-6">
+        </div>
+      </div>
+      <!-- Header Row -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <h2>User Details</h2>
+        </div>
+        <div class="col-md-6 text-end" *ngIf="loggedUser.role === 'Admin'">
+          <p-button label="Add Task" icon="pi pi-plus" (click)="openTaskDialog()"></p-button>
+        </div>
+      </div>
+  
+      <!-- User Information -->
+      @if (userdetails) {
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="card p-3 shadow-sm">
+              <p><strong>Name:</strong> {{ userdetails.name }}</p>
+              <p><strong>Email:</strong> {{ userdetails.email }}</p>
+              <p><strong>Project:</strong> {{ userdetails.project }}</p>
+              <p><strong>Phone:</strong> {{ userdetails.phone }}</p>
+              <p><strong>Role:</strong> {{ userdetails.role }}</p>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="row">
+          <div class="col-md-12 text-center">
+            <h4>No Details Found</h4>
+          </div>
+        </div>
+      }
+  
+      <!-- Task Table -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+              <thead class="table-dark">
+                <tr>
+                  <th>No.</th>
+                  <th>Task</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th>Status</th>
+                  <th>Percentage</th>
+                  <th>Summary</th>
+                  <th colspan="2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (task of userdetails?.tasks; track $index) {
+                  <tr>
+                    <td>{{$index + 1}}</td>
+                    <td>{{ task.taskName }}</td>
+                    <td>{{ task.startDate }}</td>
+                    <td>{{ task.endDate }}</td>
+                    <td>{{ task.status }}</td>
+                    <td>{{ task.percentageCompleted }}%</td>
+                    <td>
+                      <p-button (click)="showSummary(task.summary, task.taskName)" label="Show" />
+                    </td>
+                    <td>
+                      <button pButton type="button" icon="pi pi-pencil" class="p-button-sm" (click)="editTask(task)"></button>
+                    </td>
+                    <td *ngIf="loggedUser.role === 'Admin'">
+                      <button class="btn btn-sm btn-danger" (click)="deleteTask(task.taskId)">Delete</button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top: 30px;" *ngIf="userdetails?.tasks && userdetails?.tasks.length>0">
+        <div class="col-md-8">
+            <div class="graph-area min-chart-height">
+                <canvas id="bar-chart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-4">
+          <div class="chart-area glass-bg">
+            <canvas id="pie-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+  <p-dialog header="Summary" [modal]="true" [(visible)]="displaySummary" [style]="{ width: '50%' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
+    <div class="row">
+      <h2>{{taskName}}</h2>
+    </div>
+    <div class="row" style="min-height: 400px;">
+      <p>{{taskSummary}}</p>
+    </div>
+</p-dialog>
+  
+    <!-- Task Dialog -->
+    <p-dialog
+    [header]="isEditMode ? 'Edit Task' : 'Add Task'"
+    [(visible)]="showTaskDialog"
+    [modal]="true"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+    [style]="{ width: '40vw' }"
+    [draggable]="false"
+    [resizable]="false"
+  >
+    <form [formGroup]="taskForm" (ngSubmit)="submitTask()">
+      <div class="grid p-fluid">
+        <div class="col-12 mb-3">
+          <label for="taskName" class="block mb-2 font-semibold">Task Name</label>
+          <input id="taskName" pInputText formControlName="taskName" class="w-full" />
+        </div>
+  
+        <div class="col-6 mb-3">
+          <label for="startDate" class="block mb-2 font-semibold">Start Date</label>
+          <input id="startDate" type="date" pInputText formControlName="startDate" class="w-full" />
+        </div>
+  
+        <div class="col-6 mb-3">
+          <label for="endDate" class="block mb-2 font-semibold">End Date</label>
+          <input id="endDate" type="date" pInputText formControlName="endDate" class="w-full" />
+        </div>
+  
+        <div class="col-6 mb-3">
+          <label for="percentageCompleted" class="block mb-2 font-semibold">Percentage Completed</label>
+          <input
+            id="percentageCompleted"
+            type="number"
+            min="0"
+            max="100"
+            pInputText
+            formControlName="percentageCompleted"
+            class="w-full"
+          />
+        </div>
+  
+        <div class="col-6 mb-3">
+          <label for="status" class="block mb-2 font-semibold">Status</label>
+          <p-dropdown
+            inputId="status"
+            [options]="statusOptions"
+            formControlName="status"
+            placeholder="Select a status"
+            class="w-full"
+          ></p-dropdown>
+        </div>
+        <div class="col-md-12">
+          
+          <p-floatlabel style="margin-top: 20px;">
+            <textarea pTextarea id="in_label" rows="5" formControlName="summary" cols="70" style="resize: none;" class="h-full"></textarea>
+            <label for="in_label">Summary</label>
+          </p-floatlabel>
+        </div>
+      </div>
+  
+      <p-footer class="flex justify-end mt-4">
+        <button
+          pButton
+          type="submit"
+          label="Save"
+          [disabled]="taskForm.invalid"
+          class="p-button-success"
+        ></button>
+      </p-footer>
+    </form>
+  </p-dialog>
+  </div>
+  

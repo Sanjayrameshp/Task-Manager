@@ -1,0 +1,73 @@
+<div class="register-main py-4 bg-white">
+    <div class="container">
+      <div class="row justify-content-center mb-4">
+        <div class="col-md-8 text-center">
+          <h2 class="fw-bold">Register User</h2>
+        </div>
+      </div>
+  
+      <form [formGroup]="userRegisterForm" (ngSubmit)="submitUserRegForm()">
+        <div class="row g-3">
+          
+          <!-- Name -->
+          <div class="col-md-6">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" id="name" pInputText formControlName="name" class="form-control" [ngClass]="{'is-invalid': isInvalid('name')}"/>
+            <small *ngIf="isInvalid('name', 'required')" class="invalid-feedback">Name is required</small>
+          </div>
+  
+          <!-- Email -->
+          <div class="col-md-6">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" pInputText formControlName="email" class="form-control" [ngClass]="{'is-invalid': isInvalid('email')}"/>
+            <small *ngIf="isInvalid('email', 'required')" class="invalid-feedback">Email is required</small>
+            <small *ngIf="isInvalid('email', 'email')" class="invalid-feedback">Enter a valid email</small>
+          </div>
+  
+          <!-- Project -->
+          <div class="col-md-6">
+            <label for="project" class="form-label">Project</label>
+            <select id="project" formControlName="project" class="form-select" [ngClass]="{'is-invalid': isInvalid('project')}">
+              <option value="">Select Project</option>
+              <option value="ecommerce">Ecommerce</option>
+              <option value="trade-talk">Trade Talk</option>
+              <option value="travel-planner">Travel Planner</option>
+              <option value="market-master">Market Master</option>
+            </select>
+            <small *ngIf="isInvalid('project', 'required')" class="invalid-feedback">Project is required</small>
+          </div>
+  
+          <!-- Phone Number -->
+          <div class="col-md-6">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input type="text" id="phone" pInputText formControlName="phone" class="form-control" [ngClass]="{'is-invalid': isInvalid('phone')}"/>
+            <small *ngIf="isInvalid('phone', 'required')" class="invalid-feedback">Phone is required</small>
+            <small *ngIf="isInvalid('phone', 'minlength')" class="invalid-feedback">Phone must be at least 10 digits</small>
+            <small *ngIf="isInvalid('phone', 'pattern')" class="invalid-feedback">Phone must contain digits only</small>
+          </div>
+  
+          <!-- Password -->
+          <div class="col-md-6">
+            <label for="password" class="form-label">Password</label>
+            <br>
+            <p-password id="password" formControlName="password" [toggleMask]="true" inputStyleClass="form-control" [ngClass]="{'p-invalid': isInvalid('password')}" />
+            <small *ngIf="isInvalid('password', 'required')" class="invalid-feedback">Password is required</small>
+            <small *ngIf="isInvalid('password', 'minlength')" class="invalid-feedback">Password must be at least 6 characters</small>
+          </div>
+  
+          <!-- Confirm Password -->
+          <div class="col-md-6">
+            <label for="confirmPassword" class="form-label">Confirm Password</label>
+            <br>
+            <p-password id="confirmPassword" formControlName="confirmPassword" [toggleMask]="true" inputStyleClass="form-control" [ngClass]="{'p-invalid': isInvalid('confirmPassword')}" />
+            <small *ngIf="isInvalid('confirmPassword', 'required')" class="invalid-feedback">Confirm Password is required</small>
+          </div>
+  
+          <!-- Submit Button -->
+          <div class="col-12 text-end mt-4">
+            <button type="submit" class="btn btn-primary px-4" [disabled]="userRegisterForm.invalid">Submit</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>

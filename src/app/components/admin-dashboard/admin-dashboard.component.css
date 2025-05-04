@@ -1,0 +1,12 @@
+.cursor-pointer {
+    cursor: pointer;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .p-button-success {
+    background-color: #198754 !important;
+    border: none !important;
+  }

@@ -1,0 +1,114 @@
+<div class="register-main py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-10 col-md-12">
+          <div class="register-section p-4 shadow rounded bg-white">
+            <div class="text-center mb-4">
+              <h2 class="fw-bold">Register Admin</h2>
+            </div>
+            <form [formGroup]="adminRegisterForm" (ngSubmit)="submitAdminRegForm()" novalidate>
+              <div class="row g-3">
+                <!-- Name -->
+                <div class="col-md-6">
+                  <label for="name" class="form-label">Name</label>
+                  <input
+                    type="text"
+                    id="name"
+                    pInputText
+                    formControlName="name"
+                    class="form-control"
+                    [ngClass]="{'is-invalid': isInvalid('name')}"
+                  />
+                  <small *ngIf="isInvalid('name')" class="invalid-feedback">Name is required</small>
+                </div>
+  
+                <!-- Email -->
+                <div class="col-md-6">
+                  <label for="email" class="form-label">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    pInputText
+                    formControlName="email"
+                    class="form-control"
+                    [ngClass]="{'is-invalid': isInvalid('email')}"
+                  />
+                  <small *ngIf="isInvalid('email', 'required')" class="invalid-feedback">Email is required</small>
+                  <small *ngIf="isInvalid('email', 'email')" class="invalid-feedback">Enter a valid email</small>
+                </div>
+  
+                <!-- Project -->
+                <div class="col-md-6">
+                  <label for="project" class="form-label">Project</label>
+                  <select
+                    id="project"
+                    formControlName="project"
+                    class="form-select"
+                    [ngClass]="{'is-invalid': isInvalid('project')}"
+                  >
+                    <option value="" disabled selected>Select a project</option>
+                    <option value="ecommerce">Ecommerce</option>
+                    <option value="trade-talk">Trade Talk</option>
+                    <option value="travel-planner">Travel Planner</option>
+                    <option value="market-master">Market Master</option>
+                  </select>
+                  <small *ngIf="isInvalid('project')" class="invalid-feedback">Project is required</small>
+                </div>
+  
+                <!-- Phone -->
+                <div class="col-md-6">
+                  <label for="phone" class="form-label">Phone Number</label>
+                  <input
+                    type="text"
+                    id="phone"
+                    pInputText
+                    formControlName="phone"
+                    class="form-control"
+                    [ngClass]="{'is-invalid': isInvalid('phone')}"
+                  />
+                  <small *ngIf="isInvalid('phone', 'required')" class="invalid-feedback">Phone is required</small>
+                  <small *ngIf="isInvalid('phone', 'minlength')" class="invalid-feedback">Phone must be at least 10 digits</small>
+                  <small *ngIf="isInvalid('phone', 'pattern')" class="invalid-feedback">Phone must contain digits only</small>
+                </div>
+  
+                <!-- Password -->
+                <div class="col-md-6">
+                  <label for="password" class="form-label">Password</label>
+                  <br />
+                  <p-password
+                    id="password"
+                    formControlName="password"
+                    [toggleMask]="true"
+                    inputStyleClass="form-control"
+                    [ngClass]="{'is-invalid': isInvalid('password')}"
+                  ></p-password>
+                  <small *ngIf="isInvalid('password')" class="invalid-feedback">Password is required</small>
+                </div>
+  
+                <!-- Confirm Password -->
+                <div class="col-md-6">
+                  <label for="confirmPassword" class="form-label">Confirm Password</label>
+                  <br />
+                  <p-password
+                    id="confirmPassword"
+                    formControlName="confirmPassword"
+                    [toggleMask]="true"
+                    inputStyleClass="form-control"
+                    [ngClass]="{'is-invalid': isInvalid('confirmPassword') || passwordMismatch()}"
+                  ></p-password>
+                  <small *ngIf="isInvalid('confirmPassword')" class="invalid-feedback">Confirm Password is required</small>
+                  <small *ngIf="passwordMismatch()" class="invalid-feedback">Passwords do not match</small>
+                </div>
+  
+                <!-- Submit -->
+                <div class="col-12 text-center mt-4">
+                  <button type="submit" class="btn btn-primary px-4" [disabled]="adminRegisterForm.invalid">Submit</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

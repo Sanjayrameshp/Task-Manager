@@ -1,0 +1,49 @@
+<div class="login-main d-flex align-items-center justify-content-center min-vh-100 bg-light">
+    <div class="card shadow p-4" style="max-width: 600px; width: 100%;">
+      <div class="card-body">
+        <h2 class="card-title text-center mb-4">Login</h2>
+        <form [formGroup]="loginForm" (ngSubmit)="submitLoginForm()">
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <label for="email" class="form-label">Email</label>
+              <input
+                type="email"
+                id="email"
+                class="form-control"
+                formControlName="email"
+                placeholder="Enter your email"
+              />
+              <small *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.hasError('required')" class="invalid-feedback"> class="invalid-feedback">email is required</small>
+            </div>
+          </div>
+  
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <label for="password" class="form-label">Password</label>
+              <br>
+              <!-- <p-password
+                id="password"
+                formControlName="password"
+                class=""
+                [toggleMask]="true"
+                inputStyleClass="form-control"
+                placeholder="Enter your password"
+              ></p-password> -->
+              <input type="password" class="form-control" id="password" formControlName="password" placeholder="Enter your password">
+              <br>
+              <small *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')" class="invalid-feedback"> class="invalid-feedback">password is required</small>
+            </div>
+          </div>
+  
+          <div class="d-grid gap-2 mb-3">
+            <button type="submit" [disabled]="loginForm.invalid" class="btn btn-primary">Login</button>
+          </div>
+  
+          <div class="text-center">
+            <a (click)="navigateToAdminRegister()" class="text-decoration-none" style="cursor: pointer;">Don't have an account? Register</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
